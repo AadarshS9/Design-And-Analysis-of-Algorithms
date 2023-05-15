@@ -1,2 +1,2 @@
 # Design-And-Analysis-of-Algorithms
-DAA S4 RSET
+Design And Analysis Of Algorithms Lab - S4 RSET
