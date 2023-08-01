@@ -1,83 +1,64 @@
 #include <stdio.h>
-#define MAX_CITY 10
-#define INF 999
+#include <stdbool.h>
+#define MAX 10
+#define INF 999999
 
-int ary[MAX_CITY][MAX_CITY], completed[MAX_CITY], n, minCost = INF;
-int minPath[MAX_CITY];
+int dist[MAX][MAX] = {0};
+int n;
+int minCost = INF;
+int minPath[MAX];
+bool visited[MAX];
 
-void takeInput()
-{
-    int i, j;
-
-    printf("Enter the number of Cities: ");
+void takeInput() {
+    printf("Enter the number of cities: ");
     scanf("%d", &n);
-
-    printf("\nEnter the Cost Matrix\n");
-
-	for (i = 0; i < n; i++) 
-	{
-		for (j = 0; j < n; j++)
-			scanf("%d", &ary[i][j]);
-		completed[i] = 0;
-	}
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &dist[i][j]);
+        }
+    }
 }
 
-void printCostMatrix()
-{
-	int i, j;
-	printf("\n\nThe Cost Matrix:\n");
-	printf("\t");
-	for (i = 0; i < n; i++)
-		printf("%c\t", 'A' + i);
-	printf("\n");
-	for (i = 0; i < n; i++) 
-	{
-		printf("%c\t", 'A' + i);
-		for (j = 0; j < n; j++)
-			printf("%d\t", ary[i][j]);
-        printf("\n");
-	}
+void tsp(int city, int count, int path[], int currentCost) {   
+    visited[city] = true;  
+    path[count] = city; 
+    if (count == n - 1 && dist[city][0] != 0) { 
+        int totalCost = currentCost + dist[city][0];    
+        if (totalCost < minCost) {  
+            minCost = totalCost;
+            for (int i = 0; i < n; i++) {
+                minPath[i] = path[i];   
+            }
+        }
+    } 
+    else {
+        for (int nextCity = 0; nextCity < n; nextCity++) {
+            if (!visited[nextCity] && dist[city][nextCity] != 0) {  
+                tsp(nextCity, count + 1, path, currentCost + dist[city][nextCity]); 
+            }
+        }
+    }
+    visited[city] = false; 
 }
 
-void mincost(int city, int count, int path[], int currentCost) 
-{
-	int i, ncity;
-	completed[city] = 1;
- 	path[count] = city;
-
-	if (count == n - 1 && ary[city][path[0]] != 0) 
-	{
-        	if (currentCost + ary[city][path[0]] < minCost)
-        	{
-			minCost = currentCost + ary[city][path[0]];
-            	for (i = 0; i < n; i++)
-                	minPath[i] = path[i];
-        	}
-    	}
-	else{
-		for (ncity = 0; ncity < n; ncity++) 
-		{
-			if (!completed[ncity] && ary[city][ncity] != 0) 
-			{
-				mincost(ncity, count + 1, path, currentCost + ary[city][ncity]);
-			}
-        	}
-	}
-	completed[city] = 0;
+void printSolution() {
+    printf("The cost of the most efficient tour = %d\n", minCost);
+    printf("Nodes visited in the most efficient tour: ");
+    for (int i = 0; i < n; i++) {
+        printf("%c", minPath[i]+65);
+        if (i != n - 1) {
+            printf(" -> ");
+        }
+    }
+    printf(" -> %c\n", minPath[0]+65); 
 }
 
-int main() 
-{
-	takeInput();
-	printCostMatrix();
-	int path[MAX_CITY];
-	mincost(0, 0, path, 0); // Start from city 0
-	printf("\nMinimum cost is %d\n", minCost);
-	printf("Minimum Cost Path: ");
-	for (int i = 0; i < n; i++)
-	printf("%c ", 'A' + minPath[i]);
-	printf("A\n");
-	return 0;
+void main() {
+    takeInput();
+    int path[MAX];
+    tsp(0, 0, path, 0);
+    printSolution();
 }
 
 // TEST CASES:
